@@ -1,0 +1,11 @@
+{
+  "common": {
+    "login": "Đăng nhập",
+    "homepage": "Trang chủ",
+    "logout": "Đăng xuất",
+    "password": "Mật khẩu",
+    "username": "Tên người dùng",
+    "acc_without": "Tên người dùng loại bỏ",
+    "example": "Ví dụ"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "validation": {
+    "username_required": "Please input your username!",
+    "password_required": "Please input your password!"
+  }
+}

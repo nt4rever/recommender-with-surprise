@@ -1,0 +1,11 @@
+{
+  "common": {
+    "homepage": "ホームページ",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "acc_without": "アカウントなし",
+    "example": "例",
+    "password": "パスワード",
+    "username": "ユーザー名"
+  }
+}

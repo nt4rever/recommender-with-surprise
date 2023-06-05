@@ -1,0 +1,11 @@
+{
+  "common": {
+    "login": "Login",
+    "homepage": "Home page",
+    "logout": "Log out",
+    "password": "Password",
+    "username": "Username",
+    "acc_without": "Account without",
+    "example": "Example"
+  }
+}

@@ -11,7 +11,7 @@ const Login: FC = (): ReactElement => {
   const { login, isLoading } = useAuth();
 
   const initialValues: LoginInput = {
-    username: '',
+    username: '53425',
     password: ''
   };
 

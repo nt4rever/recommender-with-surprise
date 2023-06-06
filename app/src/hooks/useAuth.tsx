@@ -21,9 +21,9 @@ const useAuth = () => {
     setIsLoading(true);
     const user: IUser = {
       firstName: 'User',
-      lastName: '#314',
+      lastName: `#${loginInput.username}`,
       username: loginInput.username,
-      userId: 314
+      userId: Number(loginInput.username) || 53424
     };
 
     // fake login code, success after 1s

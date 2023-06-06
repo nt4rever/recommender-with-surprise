@@ -1,16 +1,55 @@
+import { useMutation } from '@tanstack/react-query';
 import { Rate, Tag } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useBookQuery } from '~/hooks';
+import { bookServices } from '~/apis/book';
+import { useAppDispatch, useAppSelector, useAuth, useBookQuery } from '~/hooks';
+import { messageActions } from '~/store/ducks/message/slice';
+import { ratingActions } from '~/store/ducks/rating/slice';
+import getRating from '~/utils/getRating';
 
 const Book = () => {
   const { id } = useParams<string>();
+  const { ratings } = useAppSelector((state) => state.rating);
+  const { auth } = useAuth();
+
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const mutation = useMutation({
+    mutationFn: bookServices.ratingBook
+  });
 
   if (!id) navigate('/');
+
+  const myRating = getRating(ratings, {
+    user_id: auth?.userId || 53425,
+    book_id: Number(id)
+  });
 
   const bookQuery = useBookQuery(id as string);
 
   if (bookQuery.isLoading) return null;
+
+  const handleRating = (value: number) => {
+    dispatch(
+      ratingActions.create({
+        user_id: auth?.userId || 53425,
+        book_id: Number(id),
+        rating: value
+      })
+    );
+    mutation.mutate(
+      {
+        book_id: Number(id),
+        user_id: auth?.userId,
+        rating: value
+      },
+      {
+        onSuccess: () => {
+          dispatch(messageActions.push('Rating created successfully'));
+        }
+      }
+    );
+  };
 
   return (
     <>
@@ -48,7 +87,7 @@ const Book = () => {
           <div className='my-5 h-[1px] bg-stone-200'></div>
           <div>
             Your review
-            <Rate className='ml-3' />
+            <Rate className='ml-3' onChange={handleRating} value={myRating?.rating} />
           </div>
           <div className='mt-5'>
             Other review

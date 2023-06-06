@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Response
+from fastapi import FastAPI, Response, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, validator
 import uvicorn
 import pandas as pd
 import json
-from utils import load_model, recommendations
+from utils import load_model, recommendations, rebuild_model
 
 app = FastAPI()
 
@@ -80,6 +81,55 @@ def recommend(user_id: str, skip: int = 0, limit: int = 10):
     response = Response(content=json.dumps(response_data),
                         media_type="application/json")
     return response
+
+
+class Rating(BaseModel):
+    book_id: int
+    user_id: int
+    rating: int = Field(..., gt=0, le=5)
+
+    # Validator to check rating value
+    @validator('rating')
+    def validate_rating(cls, rating):
+        if rating < 1 or rating > 5:
+            raise ValueError("Rating value must be between 1 and 5")
+        return rating
+
+
+@app.post("/rating")
+def rating_book(rating: Rating):
+    book_id = rating.book_id
+    user_id = rating.user_id
+    rating_value = rating.rating
+    global ratings_data
+
+    new_row = pd.DataFrame(
+        {"book_id": book_id, "user_id": user_id, "rating": rating_value}, index=[0])
+    ratings_data = pd.concat(
+        [new_row, ratings_data.loc[:]]).reset_index(drop=True)
+    print(ratings_data.head())
+    # Example response
+    response = {"message": "Rating created successfully",
+                "book_id": book_id,
+                "user_id": user_id,
+                "rating": rating_value}
+    return response
+
+
+def background_task(df):
+    global model
+    new_model = rebuild_model(df)
+    model = new_model
+    print("Background task executed: model has been rebuilt")
+
+
+@app.post("/rebuild")
+async def process_request(background_tasks: BackgroundTasks):
+    # Process the request
+    # Add the background task to the queue
+    global ratings_data
+    background_tasks.add_task(background_task, ratings_data)
+    return {"message": "Request processed. Background task will run in the background."}
 
 
 if __name__ == "__main__":

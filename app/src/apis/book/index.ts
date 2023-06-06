@@ -4,7 +4,9 @@ import axiosClient from '~/utils/axiosClient';
 enum ENDPOINT {
   TOP_BOOKS = '/books',
   BOOK = '/book',
-  RECOMMEND = '/recommend'
+  RECOMMEND = '/recommend',
+  RATING = '/rating',
+  REBUILD = '/rebuild'
 }
 
 const getTopBooks = async ({ pageParam = 0, limit = 8 }) => {
@@ -39,4 +41,26 @@ const getRecommendBooks = async ({
   return data;
 };
 
-export const bookServices = { getTopBooks, getBook, getRecommendBooks };
+interface RatingPayload {
+  book_id?: number;
+  user_id?: number;
+  rating: number;
+}
+
+const ratingBook = async (payload: RatingPayload) => {
+  const { data } = await axiosClient.post(ENDPOINT.RATING, payload);
+  return data;
+};
+
+const rebuild = async () => {
+  const { data } = await axiosClient.post(ENDPOINT.REBUILD);
+  return data;
+};
+
+export const bookServices = {
+  getTopBooks,
+  getBook,
+  getRecommendBooks,
+  ratingBook,
+  rebuild
+};

@@ -2,11 +2,13 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { bookServices } from '~/apis/book';
 import SectionButton from '../TrendingSection/Button';
 import BookItem from '../shared/BookItem';
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '~/hooks';
 
 const RecommendSection = () => {
   const { auth } = useAuth();
+
+  const [isRecommend, setIsRecommend] = useState(false);
 
   const { data, isLoading, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['books-recommend', auth?.userId],
@@ -15,10 +17,16 @@ const RecommendSection = () => {
     getNextPageParam: (lastPage) => {
       if (lastPage.cursor < lastPage.total) return lastPage.cursor;
       return undefined;
-    }
+    },
+    enabled: isRecommend
   });
 
-  if (isLoading) return null;
+  // if (isLoading) return 'Nothing';
+
+  const handleLoadMore = () => {
+    setIsRecommend(true);
+    fetchNextPage();
+  };
 
   return (
     <div className='py-8'>
@@ -37,8 +45,8 @@ const RecommendSection = () => {
         ))}
       </div>
       <div className='mt-8 flex justify-center'>
-        <SectionButton onClick={() => fetchNextPage()}>
-          {hasNextPage ? 'Load More' : 'Nothing more to load'}
+        <SectionButton onClick={handleLoadMore}>
+          {hasNextPage ? 'Load More' : 'Get recommend'}
         </SectionButton>
       </div>
     </div>

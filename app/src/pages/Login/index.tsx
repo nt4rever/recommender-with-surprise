@@ -12,7 +12,7 @@ const Login: FC = (): ReactElement => {
 
   const initialValues: LoginInput = {
     username: '53425',
-    password: ''
+    password: '123456'
   };
 
   const handleSubmit = (values: LoginInput) => {

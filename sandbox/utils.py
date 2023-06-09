@@ -18,12 +18,23 @@ def compute_ranking(model, uid, iid):
     return model.predict(uid, iid).est
 
 
-def recommendations(model, uid, df_items, skip=0, limit=10):
+def get_user_rated_books(uid, df_ratings):
+    user_ratings = df_ratings[df_ratings["user_id"] == uid]
+    user_rated_books = user_ratings["book_id"].tolist()
+    return user_rated_books
+
+
+def recommendations(model, uid, df_items, df_ratings, skip=0, limit=10):
     df_recommendations = df_items.copy()
-    df_recommendations["rating_predicted"] = df_recommendations["book_id"].apply(
+    df_recommendations["rating_predicted"] = df_recommendations["id"].apply(
         lambda book_id: compute_ranking(model, uid, book_id))
     df_recommendations.sort_values(
         "rating_predicted", ascending=False, inplace=True)
+
+    # don't recommend books that users have rated
+    user_rated_books = get_user_rated_books(uid, df_ratings)
+    df_recommendations = df_recommendations[~df_recommendations["id"].isin(
+        user_rated_books)]
     return df_recommendations.iloc[skip: skip + limit].reset_index(drop=True)
 
 

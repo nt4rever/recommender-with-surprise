@@ -67,8 +67,9 @@ def getBook(book_id: int):
 
 
 @app.get("/recommend/{user_id}")
-def recommend(user_id: str, skip: int = 0, limit: int = 10):
-    df_result = recommendations(model, user_id, books_metadata, skip, limit)
+def recommend(user_id: int, skip: int = 0, limit: int = 10):
+    df_result = recommendations(
+        model, user_id, books_metadata, ratings_data, skip, limit)
     json_data = df_result.to_json(orient='records')
     total_count = books.shape[0]
     # Create the response dictionary
